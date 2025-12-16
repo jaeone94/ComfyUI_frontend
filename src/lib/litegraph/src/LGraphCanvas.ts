@@ -4770,6 +4770,7 @@ export class LGraphCanvas implements CustomEventDispatcher<LGraphCanvasEventMap>
               }
             )
           }
+          if (renderLink instanceof MovingInputLink) this.setDirty(false, true)
 
           ctx.fillStyle = colour
           ctx.beginPath()
