@@ -165,9 +165,7 @@ const translateMenuItem = (item: MenuItem): MenuItem => {
 }
 
 const showSettings = (defaultPanel?: string) => {
-  settingsDialog.show(
-    defaultPanel as Parameters<typeof settingsDialog.show>[0]
-  )
+  settingsDialog.show(defaultPanel as Parameters<typeof settingsDialog.show>[0])
 }
 
 const showManageExtensions = async () => {

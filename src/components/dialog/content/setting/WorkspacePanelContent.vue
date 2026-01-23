@@ -151,5 +151,4 @@ const menuItems = computed(() => {
 
   return items
 })
-
 </script>
