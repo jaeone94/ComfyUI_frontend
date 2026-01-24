@@ -4027,15 +4027,14 @@ export class LGraphCanvas implements CustomEventDispatcher<LGraphCanvasEventMap>
       }
     }
 
-    // Adjust positions
+    // Adjust positions - use move/setPos to ensure layout store is updated
+    const dx = position[0] - offsetX
+    const dy = position[1] - offsetY
     for (const item of created) {
-      const newX = item.pos[0] + position[0] - offsetX
-      const newY = item.pos[1] + position[1] - offsetY
       if (item instanceof LGraphNode) {
-        item.setPos(newX, newY)
-      } else {
-        item.pos[0] = newX
-        item.pos[1] = newY
+        item.setPos(item.pos[0] + dx, item.pos[1] + dy)
+      } else if (item instanceof Reroute) {
+        item.move(dx, dy)
       }
     }
 
