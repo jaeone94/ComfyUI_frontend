@@ -333,9 +333,10 @@ function initSizeStyles() {
   if (!el) return
 
   const suffix = isCollapsed.value ? '-x' : ''
+  const fullHeight = height + LiteGraph.NODE_TITLE_HEIGHT
 
   el.style.setProperty(`--node-width${suffix}`, `${width}px`)
-  el.style.setProperty(`--node-height${suffix}`, `${height}px`)
+  el.style.setProperty(`--node-height${suffix}`, `${fullHeight}px`)
 }
 
 /**
@@ -361,8 +362,9 @@ function handleLayoutChange(change: {
   if (!el) return
 
   const newSize = size.value
+  const fullHeight = newSize.height + LiteGraph.NODE_TITLE_HEIGHT
   el.style.setProperty('--node-width', `${newSize.width}px`)
-  el.style.setProperty('--node-height', `${newSize.height}px`)
+  el.style.setProperty('--node-height', `${fullHeight}px`)
 }
 
 let unsubscribeLayoutChange: (() => void) | null = null
