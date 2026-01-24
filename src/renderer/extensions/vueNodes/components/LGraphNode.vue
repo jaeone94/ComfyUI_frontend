@@ -164,6 +164,7 @@ import {
   nextTick,
   onErrorCaptured,
   onMounted,
+  onUnmounted,
   ref,
   watch
 } from 'vue'
@@ -186,6 +187,7 @@ import { useTelemetry } from '@/platform/telemetry'
 import { useCanvasStore } from '@/renderer/core/canvas/canvasStore'
 import { useCanvasInteractions } from '@/renderer/core/canvas/useCanvasInteractions'
 import { layoutStore } from '@/renderer/core/layout/store/layoutStore'
+import { LayoutSource } from '@/renderer/core/layout/types'
 import SlotConnectionDot from '@/renderer/extensions/vueNodes/components/SlotConnectionDot.vue'
 import { useNodeEventHandlers } from '@/renderer/extensions/vueNodes/composables/useNodeEventHandlers'
 import { useNodePointerInteractions } from '@/renderer/extensions/vueNodes/composables/useNodePointerInteractions'
@@ -322,15 +324,8 @@ const handleContextMenu = (event: MouseEvent) => {
   showNodeOptions(event)
 }
 
-onMounted(() => {
-  initSizeStyles()
-})
-
 /**
- * Set initial DOM size from layout store, but respect intrinsic content minimum.
- * Important: nodes can mount in a collapsed state, and the collapse watcher won't
- * run initially. Match the collapsed runtime behavior by writing to the correct
- * CSS variables on mount.
+ * Set initial DOM size from layout store.
  */
 function initSizeStyles() {
   const el = nodeContainerRef.value
@@ -342,6 +337,44 @@ function initSizeStyles() {
   el.style.setProperty(`--node-width${suffix}`, `${width}px`)
   el.style.setProperty(`--node-height${suffix}`, `${height}px`)
 }
+
+/**
+ * Handle external size changes (e.g., from extensions calling node.setSize()).
+ * Updates CSS variables when layoutStore changes from Canvas/External source.
+ */
+function handleLayoutChange(change: {
+  source: LayoutSource
+  nodeIds: string[]
+}) {
+  // Only handle Canvas or External source (extensions calling setSize)
+  if (
+    change.source !== LayoutSource.Canvas &&
+    change.source !== LayoutSource.External
+  )
+    return
+
+  if (!change.nodeIds.includes(nodeData.id)) return
+  if (layoutStore.isResizingVueNodes.value) return
+  if (isCollapsed.value) return
+
+  const el = nodeContainerRef.value
+  if (!el) return
+
+  const newSize = size.value
+  el.style.setProperty('--node-width', `${newSize.width}px`)
+  el.style.setProperty('--node-height', `${newSize.height}px`)
+}
+
+let unsubscribeLayoutChange: (() => void) | null = null
+
+onMounted(() => {
+  initSizeStyles()
+  unsubscribeLayoutChange = layoutStore.onChange(handleLayoutChange)
+})
+
+onUnmounted(() => {
+  unsubscribeLayoutChange?.()
+})
 
 const baseResizeHandleClasses =
   'absolute h-3 w-3 opacity-0 pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/40'
