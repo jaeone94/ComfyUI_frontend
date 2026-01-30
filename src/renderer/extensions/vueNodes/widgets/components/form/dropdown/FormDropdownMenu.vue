@@ -27,7 +27,8 @@ interface Props {
   updateKey?: MaybeRefOrGetter<unknown>
 }
 
-const props = defineProps<Props>()
+const { items, isSelected, filterOptions, sortOptions, searcher, updateKey } =
+  defineProps<Props>()
 const emit = defineEmits<{
   (e: 'item-click', item: DropdownItem, index: number): void
 }>()
@@ -38,61 +39,40 @@ const layoutMode = defineModel<LayoutMode>('layoutMode')
 const sortSelected = defineModel<OptionId>('sortSelected')
 const searchQuery = defineModel<string>('searchQuery')
 
-// VirtualGrid configuration based on layout mode
-const maxColumns = computed(() => {
-  switch (layoutMode.value) {
-    case 'grid':
-      return 4
-    case 'list':
-    case 'list-small':
-      return 1
-    default:
-      return 4
-  }
-})
+// VirtualGrid layout configuration
+type LayoutConfig = {
+  maxColumns: number
+  itemHeight: number
+  itemWidth: number
+  gap: string
+}
 
-const defaultItemHeight = computed(() => {
-  switch (layoutMode.value) {
-    case 'grid':
-      return 120
-    case 'list':
-      return 64
-    case 'list-small':
-      return 40
-    default:
-      return 120
+const LAYOUT_CONFIGS: Record<LayoutMode, LayoutConfig> = {
+  grid: { maxColumns: 4, itemHeight: 120, itemWidth: 89, gap: '1rem 0.5rem' },
+  list: { maxColumns: 1, itemHeight: 64, itemWidth: 380, gap: '0.5rem' },
+  'list-small': {
+    maxColumns: 1,
+    itemHeight: 40,
+    itemWidth: 380,
+    gap: '0.25rem'
   }
-})
+}
 
-const defaultItemWidth = computed(() => {
-  switch (layoutMode.value) {
-    case 'grid':
-      return 89
-    case 'list':
-    case 'list-small':
-      return 380
-    default:
-      return 89
-  }
-})
+const layoutConfig = computed<LayoutConfig>(
+  () => LAYOUT_CONFIGS[layoutMode.value ?? 'grid']
+)
 
 const gridStyle = computed<CSSProperties>(() => ({
   display: 'grid',
-  gridTemplateColumns:
-    layoutMode.value === 'grid' ? 'repeat(4, 1fr)' : 'repeat(1, 1fr)',
-  gap:
-    layoutMode.value === 'grid'
-      ? '1rem 0.5rem'
-      : layoutMode.value === 'list'
-        ? '0.5rem'
-        : '0.25rem',
+  gridTemplateColumns: `repeat(${layoutConfig.value.maxColumns}, 1fr)`,
+  gap: layoutConfig.value.gap,
   padding: '1rem',
   width: '100%'
 }))
 
 type VirtualDropdownItem = DropdownItem & { key: string }
 const virtualItems = computed<VirtualDropdownItem[]>(() =>
-  props.items.map((item) => ({
+  items.map((item) => ({
     ...item,
     key: String(item.id)
   }))
@@ -101,7 +81,7 @@ const virtualItems = computed<VirtualDropdownItem[]>(() =>
 
 <template>
   <div
-    class="flex h-[640px] w-103 flex-col rounded-lg bg-component-node-background pt-4 outline outline-offset-[-1px] outline-node-component-border"
+    class="flex max-h-[640px] w-103 flex-col rounded-lg bg-component-node-background pt-4 outline outline-offset-[-1px] outline-node-component-border"
   >
     <!-- Filter -->
     <FormDropdownMenuFilter
@@ -128,7 +108,7 @@ const virtualItems = computed<VirtualDropdownItem[]>(() =>
         <i
           :title="$t('g.noItems')"
           :aria-label="$t('g.noItems')"
-          class="icon-[lucide--circle-off] size-30 text-zinc-500/20"
+          class="icon-[lucide--circle-off] size-30 text-muted-foreground/20"
         />
       </div>
       <!-- Virtualized Grid -->
@@ -137,9 +117,9 @@ const virtualItems = computed<VirtualDropdownItem[]>(() =>
         :key="layoutMode"
         :items="virtualItems"
         :grid-style="gridStyle"
-        :max-columns="maxColumns"
-        :default-item-height="defaultItemHeight"
-        :default-item-width="defaultItemWidth"
+        :max-columns="layoutConfig.maxColumns"
+        :default-item-height="layoutConfig.itemHeight"
+        :default-item-width="layoutConfig.itemWidth"
         :buffer-rows="2"
         class="h-full"
       >

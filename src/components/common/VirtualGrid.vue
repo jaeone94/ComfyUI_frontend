@@ -57,6 +57,10 @@ const emit = defineEmits<{
   'approach-end': []
 }>()
 
+defineSlots<{
+  item: (props: { item: T & { key: string }; index: number }) => unknown
+}>()
+
 const itemHeight = ref(defaultItemHeight)
 const itemWidth = ref(defaultItemWidth)
 const container = ref<HTMLElement | null>(null)
