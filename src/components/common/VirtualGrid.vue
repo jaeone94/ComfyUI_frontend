@@ -6,12 +6,12 @@
     <div :style="topSpacerStyle" />
     <div :style="mergedGridStyle">
       <div
-        v-for="item in renderedItems"
+        v-for="(item, i) in renderedItems"
         :key="item.key"
         class="transition-[width] duration-150 ease-out"
         data-virtual-grid-item
       >
-        <slot name="item" :item="item" />
+        <slot name="item" :item="item" :index="state.start + i" />
       </div>
     </div>
     <div :style="bottomSpacerStyle" />
