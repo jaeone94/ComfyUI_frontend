@@ -376,6 +376,18 @@ export const useAssetsStore = defineStore('assets', () => {
       }
 
       /**
+       * Check if a category exists in the cache.
+       * Checks both direct category keys and tag-prefixed keys.
+       * @param category The category to check (e.g., 'checkpoints', 'loras')
+       */
+      function hasCategory(category: string): boolean {
+        return (
+          modelStateByCategory.value.has(category) ||
+          modelStateByCategory.value.has(`tag:${category}`)
+        )
+      }
+
+      /**
        * Internal helper to fetch and cache assets for a category.
        * Loads first batch immediately, then progressively loads remaining batches.
        * Keeps existing data visible until new data is successfully fetched.
@@ -608,17 +620,61 @@ export const useAssetsStore = defineStore('assets', () => {
         }
       }
 
+      /**
+       * Invalidate model caches for a given category (e.g., 'checkpoints', 'loras')
+       * Refreshes all node types that provide this category plus tag-based caches
+       * @param category The model category to invalidate (e.g., 'checkpoints')
+       */
+      async function invalidateModelsForCategory(
+        category: string
+      ): Promise<void> {
+        const providers = modelToNodeStore
+          .getAllNodeProviders(category)
+          .filter((provider) => provider.nodeDef?.name)
+
+        const nodeTypeUpdates = providers.map((provider) =>
+          updateModelsForNodeType(provider.nodeDef.name)
+        )
+
+        const tagUpdates = [
+          updateModelsForTag(category),
+          updateModelsForTag('models')
+        ]
+
+        await Promise.allSettled([...nodeTypeUpdates, ...tagUpdates])
+      }
+
+      /**
+       * Remove a specific asset from a category's cache.
+       * Used for optimistic updates after asset deletion.
+       * @param assetId The asset ID to remove
+       * @param category The model category (e.g., 'loras')
+       */
+      function removeAssetFromCache(assetId: string, category: string): void {
+        const state = modelStateByCategory.value.get(category)
+        if (state) {
+          state.assets.delete(assetId)
+          assetsArrayCache.delete(category)
+        }
+
+        assetsArrayCache.delete(`tag:${category}`)
+        assetsArrayCache.delete('tag:models')
+      }
+
       return {
         getAssets,
         isLoading,
         getError,
         hasMore,
         hasAssetKey,
+        hasCategory,
         updateModelsForNodeType,
         updateModelsForTag,
         invalidateCategory,
         updateAssetMetadata,
-        updateAssetTags
+        updateAssetTags,
+        invalidateModelsForCategory,
+        removeAssetFromCache
       }
     }
 
@@ -629,11 +685,14 @@ export const useAssetsStore = defineStore('assets', () => {
       getError: () => undefined,
       hasMore: () => false,
       hasAssetKey: () => false,
+      hasCategory: () => false,
       updateModelsForNodeType: async () => {},
       invalidateCategory: () => {},
       updateModelsForTag: async () => {},
       updateAssetMetadata: async () => {},
-      updateAssetTags: async () => {}
+      updateAssetTags: async () => {},
+      invalidateModelsForCategory: async () => {},
+      removeAssetFromCache: () => {}
     }
   }
 
@@ -643,11 +702,14 @@ export const useAssetsStore = defineStore('assets', () => {
     getError,
     hasMore,
     hasAssetKey,
+    hasCategory,
     updateModelsForNodeType,
     updateModelsForTag,
     invalidateCategory,
     updateAssetMetadata,
-    updateAssetTags
+    updateAssetTags,
+    invalidateModelsForCategory,
+    removeAssetFromCache
   } = getModelState()
 
   // Watch for completed downloads and refresh model caches
@@ -718,12 +780,15 @@ export const useAssetsStore = defineStore('assets', () => {
     getError,
     hasMore,
     hasAssetKey,
+    hasCategory,
 
     // Model assets - actions
     updateModelsForNodeType,
     updateModelsForTag,
     invalidateCategory,
     updateAssetMetadata,
-    updateAssetTags
+    updateAssetTags,
+    invalidateModelsForCategory,
+    removeAssetFromCache
   }
 })
