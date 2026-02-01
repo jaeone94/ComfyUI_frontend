@@ -64,7 +64,6 @@ const layoutConfig = computed<LayoutConfig>(
 
 const gridStyle = computed<CSSProperties>(() => ({
   display: 'grid',
-  gridTemplateColumns: `repeat(${layoutConfig.value.maxColumns}, 1fr)`,
   gap: layoutConfig.value.gap,
   padding: '1rem',
   width: '100%'
@@ -81,7 +80,7 @@ const virtualItems = computed<VirtualDropdownItem[]>(() =>
 
 <template>
   <div
-    class="flex max-h-[640px] w-103 flex-col rounded-lg bg-component-node-background pt-4 outline outline-offset-[-1px] outline-node-component-border"
+    class="flex h-[640px] w-103 flex-col rounded-lg bg-component-node-background pt-4 outline outline-offset-[-1px] outline-node-component-border"
   >
     <!-- Filter -->
     <FormDropdownMenuFilter

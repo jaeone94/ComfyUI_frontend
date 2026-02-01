@@ -71,11 +71,10 @@ describe('VirtualGrid', () => {
 
     await nextTick()
 
-    if (receivedIndices.length > 0) {
-      expect(receivedIndices[0]).toBe(0)
-      for (let i = 1; i < receivedIndices.length; i++) {
-        expect(receivedIndices[i]).toBe(receivedIndices[i - 1] + 1)
-      }
+    expect(receivedIndices.length).toBeGreaterThan(0)
+    expect(receivedIndices[0]).toBe(0)
+    for (let i = 1; i < receivedIndices.length; i++) {
+      expect(receivedIndices[i]).toBe(receivedIndices[i - 1] + 1)
     }
 
     wrapper.unmount()
@@ -96,6 +95,9 @@ describe('VirtualGrid', () => {
 
     const gridElement = wrapper.find('[style*="grid"]')
     expect(gridElement.exists()).toBe(true)
+
+    const style = gridElement.attributes('style') ?? ''
+    expect(style).toContain('repeat(2')
 
     wrapper.unmount()
   })
