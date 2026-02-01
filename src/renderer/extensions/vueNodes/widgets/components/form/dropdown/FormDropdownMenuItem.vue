@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue'
 
-import LazyImage from '@/components/common/LazyImage.vue'
 import { cn } from '@/utils/tailwindUtil'
 
 import { AssetKindKey } from './types'
@@ -58,7 +57,7 @@ function handleVideoLoad(event: Event) {
     :class="
       cn(
         'flex gap-1 select-none group/item cursor-pointer bg-component-node-widget-background',
-        'transition-all duration-150',
+        'transition-[transform,box-shadow,background-color] duration-150',
         {
           'flex-col text-center': layout === 'grid',
           'flex-row text-left max-h-16 rounded-lg hover:scale-102 active:scale-98':
@@ -80,7 +79,7 @@ function handleVideoLoad(event: Event) {
         cn(
           'relative',
           'w-full aspect-square overflow-hidden outline-1 outline-offset-[-1px] outline-interface-stroke',
-          'transition-all duration-150',
+          'transition-[transform,box-shadow] duration-150',
           {
             'min-w-16 max-w-16 rounded-l-lg': layout === 'list',
             'rounded-sm group-hover/item:scale-108 group-active/item:scale-95':
@@ -109,11 +108,12 @@ function handleVideoLoad(event: Event) {
         muted
         @loadeddata="handleVideoLoad"
       />
-      <LazyImage
+      <img
         v-else-if="mediaSrc"
         :src="mediaSrc"
         :alt="name"
-        image-class="size-full object-cover"
+        draggable="false"
+        class="size-full object-cover"
         @load="handleImageLoad"
       />
       <div
