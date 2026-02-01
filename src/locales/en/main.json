@@ -1787,6 +1787,19 @@
     "noInputImage": "No input image connected",
     "cropPreviewAlt": "Crop preview"
   },
+  "painter": {
+    "tool": "Tool",
+    "brush": "Brush",
+    "eraser": "Eraser",
+    "size": "Cursor Size",
+    "color": "Color Picker",
+    "hardness": "Hardness",
+    "width": "Width",
+    "height": "Height",
+    "background": "Background",
+    "clear": "Clear",
+    "uploadError": "Failed to upload painter image: {status} - {statusText}"
+  },
   "boundingBox": {
     "x": "X",
     "y": "Y",

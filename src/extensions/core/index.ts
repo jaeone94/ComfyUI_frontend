@@ -17,6 +17,7 @@ if (!isCloud) {
   await import('./nodeTemplates')
 }
 import './noteNode'
+import './painter'
 import './previewAny'
 import './rerouteNode'
 import './saveImageExtraOutput'
