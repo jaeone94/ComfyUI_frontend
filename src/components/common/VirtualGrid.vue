@@ -57,8 +57,6 @@ const emit = defineEmits<{
   'approach-end': []
 }>()
 
-
-
 const itemHeight = ref(defaultItemHeight)
 const itemWidth = ref(defaultItemWidth)
 const container = ref<HTMLElement | null>(null)
