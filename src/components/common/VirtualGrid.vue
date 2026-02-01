@@ -11,7 +11,7 @@
         class="transition-[width] duration-150 ease-out"
         data-virtual-grid-item
       >
-        <slot name="item" :item="item" :index="state.start + i" />
+        <slot name="item" :item :index="state.start + i" />
       </div>
     </div>
     <div :style="bottomSpacerStyle" />
