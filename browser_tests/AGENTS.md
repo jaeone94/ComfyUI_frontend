@@ -15,13 +15,13 @@ A Playwright test-writing skill exists at `.claude/skills/writing-playwright-tes
 
 **When modifying test infrastructure** (fixtures, helpers, ComfyPage methods, etc.), update the corresponding skill documentation:
 
-| Changed | Update |
-|---------|--------|
-| `fixtures/ComfyPage.ts` | `reference/fixtures.md` |
-| `fixtures/ComfyMouse.ts` | `reference/fixtures.md` |
-| `fixtures/components/*` | `reference/fixtures.md` |
-| `fixtures/VueNodeHelpers.ts` | `features/vue-nodes.md` |
-| New test patterns | Relevant `core/`, `testing/`, or `features/` file |
-| New assets structure | `testing/assets.md` |
+| Changed                      | Update                                            |
+| ---------------------------- | ------------------------------------------------- |
+| `fixtures/ComfyPage.ts`      | `reference/fixtures.md`                           |
+| `fixtures/ComfyMouse.ts`     | `reference/fixtures.md`                           |
+| `fixtures/components/*`      | `reference/fixtures.md`                           |
+| `fixtures/VueNodeHelpers.ts` | `features/vue-nodes.md`                           |
+| New test patterns            | Relevant `core/`, `testing/`, or `features/` file |
+| New assets structure         | `testing/assets.md`                               |
 
 This ensures agents can write tests correctly without needing to reverse-engineer the fixtures.
