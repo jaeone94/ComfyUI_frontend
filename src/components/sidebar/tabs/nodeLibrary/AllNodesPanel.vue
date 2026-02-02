@@ -71,7 +71,9 @@ const favoritesRoot = computed(() =>
   fillNodeInfo(nodeBookmarkStore.bookmarkedRoot)
 )
 
-function handleAddToFavorites(node: RenderedTreeExplorerNode<ComfyNodeDefImpl>) {
+function handleAddToFavorites(
+  node: RenderedTreeExplorerNode<ComfyNodeDefImpl>
+) {
   if (node.data) {
     nodeBookmarkStore.toggleBookmark(node.data)
   }

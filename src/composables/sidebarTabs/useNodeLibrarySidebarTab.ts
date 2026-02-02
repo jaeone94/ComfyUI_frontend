@@ -6,9 +6,10 @@ import type { SidebarTabExtension } from '@/types/extensionTypes'
 
 export const useNodeLibrarySidebarTab = (): SidebarTabExtension => {
   const urlParams = new URLSearchParams(window.location.search)
-  const component = urlParams.get('nodeRedesign') === 'true'
-    ? NodeLibrarySidebarTabV2
-    : NodeLibrarySidebarTab
+  const component =
+    urlParams.get('nodeRedesign') === 'true'
+      ? NodeLibrarySidebarTabV2
+      : NodeLibrarySidebarTab
 
   return {
     id: 'node-library',
