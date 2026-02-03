@@ -17,7 +17,7 @@ import SettingDialogHeader from '@/components/dialog/header/SettingDialogHeader.
 import { t } from '@/i18n'
 import { useTelemetry } from '@/platform/telemetry'
 import { isCloud } from '@/platform/distribution/types'
-import { useSubscription } from '@/platform/cloud/subscription/composables/useSubscription'
+import { useBillingContext } from '@/composables/billing/useBillingContext'
 import SettingDialogContent from '@/platform/settings/components/SettingDialogContent.vue'
 import { useDialogStore } from '@/stores/dialogStore'
 import type {
@@ -342,7 +342,7 @@ export const useDialogService = () => {
   function showTopUpCreditsDialog(options?: {
     isInsufficientCredits?: boolean
   }) {
-    const { isActiveSubscription } = useSubscription()
+    const { isActiveSubscription } = useBillingContext()
     if (!isActiveSubscription.value) return
 
     return dialogStore.showDialog({
