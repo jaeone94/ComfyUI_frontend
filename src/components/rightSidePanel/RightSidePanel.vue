@@ -13,11 +13,13 @@ import { SubgraphNode } from '@/lib/litegraph/src/litegraph'
 import type { LGraphNode } from '@/lib/litegraph/src/litegraph'
 import { useSettingStore } from '@/platform/settings/settingStore'
 import { useCanvasStore } from '@/renderer/core/canvas/canvasStore'
+import { useExecutionStore } from '@/stores/executionStore'
 import { useRightSidePanelStore } from '@/stores/workspace/rightSidePanelStore'
 import type { RightSidePanelTab } from '@/stores/workspace/rightSidePanelStore'
 import { resolveNodeDisplayName } from '@/utils/nodeTitleUtil'
 import { cn } from '@/utils/tailwindUtil'
 
+import TabError from './TabError.vue'
 import TabInfo from './info/TabInfo.vue'
 import TabGlobalParameters from './parameters/TabGlobalParameters.vue'
 import TabNodes from './parameters/TabNodes.vue'
@@ -32,6 +34,7 @@ import {
 import SubgraphEditor from './subgraph/SubgraphEditor.vue'
 
 const canvasStore = useCanvasStore()
+const executionStore = useExecutionStore()
 const rightSidePanelStore = useRightSidePanelStore()
 const settingStore = useSettingStore()
 const { t } = useI18n()
@@ -85,10 +88,25 @@ function closePanel() {
 type RightSidePanelTabList = Array<{
   label: () => string
   value: RightSidePanelTab
+  icon?: string
 }>
+
+//FIXME all errors if nothing selected?
+const selectedNodeErrors = computed(() =>
+  selectedNodes.value
+    .map((node) => executionStore.getNodeErrors(`${node.id}`))
+    .filter((nodeError) => !!nodeError)
+)
 
 const tabs = computed<RightSidePanelTabList>(() => {
   const list: RightSidePanelTabList = []
+  if (selectedNodeErrors.value.length) {
+    list.push({
+      label: () => 'Error',
+      value: 'error',
+      icon: 'icon-[lucide--octagon-alert] bg-node-stroke-error ml-1'
+    })
+  }
 
   list.push({
     label: () =>
@@ -263,6 +281,7 @@ function handleTitleCancel() {
             :value="tab.value"
           >
             {{ tab.label() }}
+            <i v-if="tab.icon" :class="cn(tab.icon, 'size-4')" />
           </Tab>
         </TabList>
       </nav>
@@ -280,6 +299,7 @@ function handleTitleCancel() {
         :node="selectedSingleNode"
       />
       <template v-else>
+        <TabError v-if="activeTab === 'error'" :errors="selectedNodeErrors" />
         <TabSubgraphInputs
           v-if="activeTab === 'parameters' && isSingleSubgraphNode"
           :node="selectedSingleNode as SubgraphNode"
