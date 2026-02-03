@@ -309,8 +309,8 @@ else
 **Results:** $total_passed passed, $total_failed failed, $total_flaky flaky, $total_skipped skipped (Total: $total_tests)"
     fi
 
-    # Extract and display failed tests from all browsers
-    if [ $total_failed -gt 0 ] || [ $total_flaky -gt 0 ]; then
+    # Extract and display failed tests from all browsers (flaky tests are treated as passing)
+    if [ $total_failed -gt 0 ]; then
         comment="$comment
 
 ### ❌ Failed Tests"
